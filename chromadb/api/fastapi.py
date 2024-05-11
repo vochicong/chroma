@@ -3,9 +3,9 @@ import logging
 from typing import Optional, cast, Tuple
 from typing import Sequence
 from uuid import UUID
-
 import requests
 from overrides import override
+from requests.adapters import HTTPAdapter
 
 import chromadb.errors as errors
 from chromadb.types import Database, Tenant
@@ -41,6 +41,8 @@ from chromadb.telemetry.opentelemetry import (
 )
 from chromadb.telemetry.product import ProductTelemetryClient
 from urllib.parse import urlparse, urlunparse, quote
+
+from chromadb.utils.net import RetryStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -112,8 +114,15 @@ class FastAPI(ServerAPI):
             default_api_path=system.settings.chroma_server_api_default_path,
         )
 
-        self._session = requests.Session()
+        if system.settings.chroma_client_retry_strategy:
+            self._retry = system.settings.chroma_client_retry_strategy.to_retry()
+        else:
+            self._retry = RetryStrategy().to_retry()
 
+        adapter = HTTPAdapter(max_retries=self._retry)
+        self._session = requests.Session()
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
         self._header = system.settings.chroma_server_headers
         if self._header is not None:
             self._session.headers.update(self._header)
