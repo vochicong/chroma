@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any, Self, Type, TypeVar
 import logging
 from chromadb.api.client import Client as ClientCreator
 from chromadb.api.client import AdminClient as AdminClientCreator
@@ -282,3 +282,36 @@ def AdminClient(settings: Settings = Settings()) -> AdminAPI:
 
     """
     return AdminClientCreator(settings=settings)
+
+
+T = TypeVar("T")
+
+
+class _TheRegistry:
+    _instance: Optional[Self] = None  # This will store the singleton instance
+    registry: Dict[str, Any] = {}
+
+    def __new__(cls: Type["_TheRegistry"]) -> "_TheRegistry":
+        if cls._instance is None:
+            cls._instance = super(_TheRegistry, cls).__new__(cls)
+            # Initialize the registry dictionary
+            cls._instance.registry = {}
+        return cls._instance
+
+    def register(self, to_register: Type[T]) -> Type[T]:
+        object_name = to_register.__name__
+
+        # There can be only one
+        if self.registry.get(object_name) is not None:
+            raise ValueError(f"Object with name {object_name} already registered.")
+        self.registry[to_register.__name__] = to_register
+        return to_register
+
+
+# Decorator for things we want to register
+def register(to_register: Type[T]) -> Type[T]:
+    return registry.register(to_register)
+
+
+# Create a global singleton instance of the registry
+registry: _TheRegistry = _TheRegistry()
