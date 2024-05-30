@@ -287,13 +287,13 @@ def AdminClient(settings: Settings = Settings()) -> AdminAPI:
 T = TypeVar("T")
 
 
-class _TheRegistry:
+class _TheChromaObjectRegistry:
     _instance: Optional[Self] = None  # This will store the singleton instance
     registry: Dict[str, Any] = {}
 
-    def __new__(cls: Type["_TheRegistry"]) -> "_TheRegistry":
+    def __new__(cls: Type["_TheChromaObjectRegistry"]) -> "_TheChromaObjectRegistry":
         if cls._instance is None:
-            cls._instance = super(_TheRegistry, cls).__new__(cls)
+            cls._instance = super(_TheChromaObjectRegistry, cls).__new__(cls)
             # Initialize the registry dictionary
             cls._instance.registry = {}
         return cls._instance
@@ -314,4 +314,4 @@ def register(to_register: Type[T]) -> Type[T]:
 
 
 # Create a global singleton instance of the registry
-registry: _TheRegistry = _TheRegistry()
+registry: _TheChromaObjectRegistry = _TheChromaObjectRegistry()
