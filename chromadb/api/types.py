@@ -199,7 +199,11 @@ class IndexMetadata(TypedDict):
 
 def _serialize_args_kwargs(*args: Any, **kwargs: Any) -> str:
     args_list = list(args)
-    return json.dumps({"args": args_list, "kwargs": kwargs})
+    try:
+        serialized = json.dumps({"args": args_list, "kwargs": kwargs})
+    except Exception as e:
+        raise ValueError(f"Failed to serialize args and kwargs: {e}")
+    return serialized
 
 
 class StoreInitArgsMeta(type):
