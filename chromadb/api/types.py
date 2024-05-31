@@ -8,7 +8,6 @@ from typing import (
     Any,
     Tuple,
     cast,
-    _ProtocolMeta,
 )
 from numpy.typing import NDArray
 import numpy as np
@@ -229,16 +228,16 @@ class RegisterMeta(type):
         return new_class
 
 
-class StoreProtocolMeta(StoreInitArgsMeta, _ProtocolMeta):
+class StoreProtocolMeta(StoreInitArgsMeta, type(Protocol)):  # type: ignore[misc]
     pass
 
 
-class RegisterProtocolMeta(RegisterMeta, _ProtocolMeta):
+class RegisterProtocolMeta(RegisterMeta, type(Protocol)):  # type: ignore[misc]
     pass
 
 
 class StoreAndRegisterProtocolMeta(
-    StoreProtocolMeta, RegisterProtocolMeta, _ProtocolMeta
+    StoreProtocolMeta, RegisterProtocolMeta, type(Protocol)  # type: ignore[misc]
 ):
     pass
 
