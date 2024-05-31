@@ -237,7 +237,9 @@ class RegisterProtocolMeta(RegisterMeta, _ProtocolMeta):
     pass
 
 
-class StoreAndRegisterProtocolMeta(StoreInitArgsMeta, RegisterMeta, _ProtocolMeta):
+class StoreAndRegisterProtocolMeta(
+    StoreProtocolMeta, RegisterProtocolMeta, _ProtocolMeta
+):
     pass
 
 
