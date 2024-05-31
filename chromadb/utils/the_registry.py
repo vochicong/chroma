@@ -15,7 +15,7 @@ class _TheChromaObjectRegistry:
             cls._instance.registry = {}
         return cls._instance
 
-    def register(self, to_register: Type[T]) -> Type[T]:
+    def _register(self, to_register: Type[T]) -> Type[T]:
         object_name = to_register.__name__
 
         # There can be only one
@@ -23,6 +23,9 @@ class _TheChromaObjectRegistry:
             raise ValueError(f"Object with name {object_name} already registered.")
         self.registry[to_register.__name__] = to_register
         return to_register
+
+    def _get(self, object_name: str) -> Any:
+        return self.registry.get(object_name)
 
 
 _chroma_object_registry: _TheChromaObjectRegistry = _TheChromaObjectRegistry()
@@ -32,4 +35,8 @@ _chroma_object_registry: _TheChromaObjectRegistry = _TheChromaObjectRegistry()
 def _register(
     to_register: Type[T],
 ) -> Type[T]:
-    return _chroma_object_registry.register(to_register)
+    return _chroma_object_registry._register(to_register)
+
+
+def _get(object_name: str) -> Any:
+    return _chroma_object_registry._get(object_name)
